@@ -1,0 +1,40 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "hern",
+      "camelcase": "Hern",
+      "title": "Hern",
+      "scope": "source.hern",
+      "file-types": [
+        "hern"
+      ],
+      "injection-regex": "^hern$",
+      "class-name": "TreeSitterHern"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Hern grammar for tree-sitter",
+    "authors": [
+      {
+        "name": "Maciej Jur",
+        "email": "maciej@kamoshi.org",
+        "url": "https://kamoshi.org/"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/tree-sitter/tree-sitter-hern"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "go": true,
+    "node": true,
+    "python": true,
+    "rust": true,
+    "swift": true,
+    "zig": false
+  }
+}
