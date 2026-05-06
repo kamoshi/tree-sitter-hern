@@ -1,10 +1,41 @@
 [
   {
-    "type": "array_expression",
+    "type": "array_element",
     "named": true,
-    "fields": {},
+    "fields": {
+      "spread": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "..",
+            "named": false
+          },
+          {
+            "type": "assignment_expression",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "pipe_expression",
+            "named": true
+          },
+          {
+            "type": "primary_expression",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
         {
@@ -25,6 +56,21 @@
         },
         {
           "type": "unary_expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "array_expression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "array_element",
           "named": true
         }
       ]
@@ -436,6 +482,10 @@
             "named": true
           },
           {
+            "type": "type_mut",
+            "named": true
+          },
+          {
             "type": "type_record",
             "named": true
           },
@@ -645,6 +695,10 @@
           },
           {
             "type": "type_identifier",
+            "named": true
+          },
+          {
+            "type": "type_mut",
             "named": true
           },
           {
@@ -900,6 +954,10 @@
             "named": true
           },
           {
+            "type": "type_mut",
+            "named": true
+          },
+          {
             "type": "type_record",
             "named": true
           },
@@ -935,10 +993,54 @@
     "fields": {
       "trait": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "parenthesized_type",
+            "named": true
+          },
+          {
+            "type": "type_apply",
+            "named": true
+          },
+          {
+            "type": "type_array",
+            "named": true
+          },
+          {
+            "type": "type_fn",
+            "named": true
+          },
+          {
+            "type": "type_hole",
+            "named": true
+          },
+          {
+            "type": "type_identifier",
+            "named": true
+          },
+          {
+            "type": "type_mut",
+            "named": true
+          },
+          {
+            "type": "type_record",
+            "named": true
+          },
+          {
+            "type": "type_tuple",
+            "named": true
+          },
+          {
+            "type": "type_variable",
+            "named": true
+          },
+          {
+            "type": "unit_type",
             "named": true
           }
         ]
@@ -973,6 +1075,10 @@
           },
           {
             "type": "type_identifier",
+            "named": true
+          },
+          {
+            "type": "type_mut",
             "named": true
           },
           {
@@ -1110,6 +1216,10 @@
           },
           {
             "type": "type_identifier",
+            "named": true
+          },
+          {
+            "type": "type_mut",
             "named": true
           },
           {
@@ -1302,6 +1412,16 @@
     "type": "parameter",
     "named": true,
     "fields": {
+      "mut": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "mut",
+            "named": false
+          }
+        ]
+      },
       "pattern": {
         "multiple": false,
         "required": true,
@@ -1342,6 +1462,10 @@
           },
           {
             "type": "type_identifier",
+            "named": true
+          },
+          {
+            "type": "type_mut",
             "named": true
           },
           {
@@ -1459,6 +1583,10 @@
         },
         {
           "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "type_mut",
           "named": true
         },
         {
@@ -1721,6 +1849,48 @@
       "required": false,
       "types": [
         {
+          "type": "record_field_or_spread",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "record_field_or_spread",
+    "named": true,
+    "fields": {
+      "spread": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "assignment_expression",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "pipe_expression",
+            "named": true
+          },
+          {
+            "type": "primary_expression",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
           "type": "field_initializer",
           "named": true
         }
@@ -1908,6 +2078,10 @@
             "named": true
           },
           {
+            "type": "type_mut",
+            "named": true
+          },
+          {
             "type": "type_record",
             "named": true
           },
@@ -1981,6 +2155,10 @@
           },
           {
             "type": "type_identifier",
+            "named": true
+          },
+          {
+            "type": "type_mut",
             "named": true
           },
           {
@@ -2160,6 +2338,10 @@
           "named": true
         },
         {
+          "type": "type_mut",
+          "named": true
+        },
+        {
           "type": "type_record",
           "named": true
         },
@@ -2212,6 +2394,10 @@
         },
         {
           "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "type_mut",
           "named": true
         },
         {
@@ -2326,6 +2512,10 @@
           "named": true
         },
         {
+          "type": "type_mut",
+          "named": true
+        },
+        {
           "type": "type_params",
           "named": true
         },
@@ -2399,6 +2589,10 @@
             "named": true
           },
           {
+            "type": "type_mut",
+            "named": true
+          },
+          {
             "type": "type_record",
             "named": true
           },
@@ -2455,6 +2649,10 @@
           "named": true
         },
         {
+          "type": "type_mut",
+          "named": true
+        },
+        {
           "type": "type_record",
           "named": true
         },
@@ -2477,6 +2675,66 @@
     "type": "type_hole",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "type_mut",
+    "named": true,
+    "fields": {
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "parenthesized_type",
+            "named": true
+          },
+          {
+            "type": "type_apply",
+            "named": true
+          },
+          {
+            "type": "type_array",
+            "named": true
+          },
+          {
+            "type": "type_fn",
+            "named": true
+          },
+          {
+            "type": "type_hole",
+            "named": true
+          },
+          {
+            "type": "type_identifier",
+            "named": true
+          },
+          {
+            "type": "type_mut",
+            "named": true
+          },
+          {
+            "type": "type_record",
+            "named": true
+          },
+          {
+            "type": "type_tuple",
+            "named": true
+          },
+          {
+            "type": "type_variable",
+            "named": true
+          },
+          {
+            "type": "unit_type",
+            "named": true
+          }
+        ]
+      }
+    }
   },
   {
     "type": "type_params",
@@ -2555,6 +2813,10 @@
         },
         {
           "type": "type_identifier",
+          "named": true
+        },
+        {
+          "type": "type_mut",
           "named": true
         },
         {
@@ -2676,6 +2938,10 @@
           },
           {
             "type": "type_identifier",
+            "named": true
+          },
+          {
+            "type": "type_mut",
             "named": true
           },
           {

@@ -410,6 +410,22 @@
       "type": "SEQ",
       "members": [
         {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "mut",
+              "content": {
+                "type": "STRING",
+                "value": "mut"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
           "type": "FIELD",
           "name": "pattern",
           "content": {
@@ -642,16 +658,29 @@
           "value": "impl"
         },
         {
-          "type": "FIELD",
-          "name": "trait",
-          "content": {
-            "type": "SYMBOL",
-            "name": "identifier"
-          }
-        },
-        {
-          "type": "STRING",
-          "value": "for"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "FIELD",
+                  "name": "trait",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_type"
+                  }
+                },
+                {
+                  "type": "STRING",
+                  "value": "for"
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "FIELD",
@@ -1799,6 +1828,32 @@
         }
       ]
     },
+    "array_element": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "spread",
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": ".."
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_expression"
+              }
+            ]
+          }
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_expression"
+        }
+      ]
+    },
     "array_expression": {
       "type": "SEQ",
       "members": [
@@ -1814,7 +1869,7 @@
               "members": [
                 {
                   "type": "SYMBOL",
-                  "name": "_expression"
+                  "name": "array_element"
                 },
                 {
                   "type": "REPEAT",
@@ -1827,7 +1882,7 @@
                       },
                       {
                         "type": "SYMBOL",
-                        "name": "_expression"
+                        "name": "array_element"
                       }
                     ]
                   }
@@ -1857,6 +1912,32 @@
         }
       ]
     },
+    "record_field_or_spread": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": ".."
+            },
+            {
+              "type": "FIELD",
+              "name": "spread",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_expression"
+              }
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "field_initializer"
+        }
+      ]
+    },
     "record_expression": {
       "type": "SEQ",
       "members": [
@@ -1876,7 +1957,7 @@
               "members": [
                 {
                   "type": "SYMBOL",
-                  "name": "field_initializer"
+                  "name": "record_field_or_spread"
                 },
                 {
                   "type": "REPEAT",
@@ -1889,7 +1970,7 @@
                       },
                       {
                         "type": "SYMBOL",
-                        "name": "field_initializer"
+                        "name": "record_field_or_spread"
                       }
                     ]
                   }
@@ -2733,6 +2814,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "type_mut"
+        },
+        {
+          "type": "SYMBOL",
           "name": "unit_type"
         },
         {
@@ -3031,6 +3116,23 @@
         {
           "type": "SYMBOL",
           "name": "_type"
+        }
+      ]
+    },
+    "type_mut": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "mut"
+        },
+        {
+          "type": "FIELD",
+          "name": "type",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_type"
+          }
         }
       ]
     },
