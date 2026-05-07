@@ -123,6 +123,36 @@
     }
   },
   {
+    "type": "associated_access_expression",
+    "named": true,
+    "fields": {
+      "member": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "type_identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "attribute",
     "named": true,
     "fields": {}
@@ -383,6 +413,10 @@
         "types": [
           {
             "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "type_identifier",
             "named": true
           }
         ]
@@ -670,51 +704,7 @@
         "required": false,
         "types": [
           {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "parenthesized_type",
-            "named": true
-          },
-          {
-            "type": "type_apply",
-            "named": true
-          },
-          {
-            "type": "type_array",
-            "named": true
-          },
-          {
-            "type": "type_fn",
-            "named": true
-          },
-          {
-            "type": "type_hole",
-            "named": true
-          },
-          {
-            "type": "type_identifier",
-            "named": true
-          },
-          {
-            "type": "type_mut",
-            "named": true
-          },
-          {
-            "type": "type_record",
-            "named": true
-          },
-          {
-            "type": "type_tuple",
-            "named": true
-          },
-          {
-            "type": "type_variable",
-            "named": true
-          },
-          {
-            "type": "unit_type",
+            "type": "return_type",
             "named": true
           }
         ]
@@ -926,51 +916,7 @@
         "required": false,
         "types": [
           {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "parenthesized_type",
-            "named": true
-          },
-          {
-            "type": "type_apply",
-            "named": true
-          },
-          {
-            "type": "type_array",
-            "named": true
-          },
-          {
-            "type": "type_fn",
-            "named": true
-          },
-          {
-            "type": "type_hole",
-            "named": true
-          },
-          {
-            "type": "type_identifier",
-            "named": true
-          },
-          {
-            "type": "type_mut",
-            "named": true
-          },
-          {
-            "type": "type_record",
-            "named": true
-          },
-          {
-            "type": "type_tuple",
-            "named": true
-          },
-          {
-            "type": "type_variable",
-            "named": true
-          },
-          {
-            "type": "unit_type",
+            "type": "return_type",
             "named": true
           }
         ]
@@ -1645,6 +1591,10 @@
           "named": true
         },
         {
+          "type": "type_identifier",
+          "named": true
+        },
+        {
           "type": "wildcard_pattern",
           "named": true
         }
@@ -1722,6 +1672,10 @@
           "named": true
         },
         {
+          "type": "associated_access_expression",
+          "named": true
+        },
+        {
           "type": "block",
           "named": true
         },
@@ -1791,6 +1745,10 @@
         },
         {
           "type": "tuple_expression",
+          "named": true
+        },
+        {
+          "type": "type_identifier",
           "named": true
         },
         {
@@ -1987,6 +1945,76 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "return_type",
+    "named": true,
+    "fields": {
+      "mut": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "mut",
+            "named": false
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "parenthesized_type",
+            "named": true
+          },
+          {
+            "type": "type_apply",
+            "named": true
+          },
+          {
+            "type": "type_array",
+            "named": true
+          },
+          {
+            "type": "type_fn",
+            "named": true
+          },
+          {
+            "type": "type_hole",
+            "named": true
+          },
+          {
+            "type": "type_identifier",
+            "named": true
+          },
+          {
+            "type": "type_mut",
+            "named": true
+          },
+          {
+            "type": "type_record",
+            "named": true
+          },
+          {
+            "type": "type_tuple",
+            "named": true
+          },
+          {
+            "type": "type_variable",
+            "named": true
+          },
+          {
+            "type": "unit_type",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -2615,60 +2643,167 @@
   {
     "type": "type_fn",
     "named": true,
-    "fields": {},
+    "fields": {
+      "return_type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "type_fn_return",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "parenthesized_type",
-          "named": true
-        },
-        {
-          "type": "type_apply",
-          "named": true
-        },
-        {
-          "type": "type_array",
-          "named": true
-        },
-        {
-          "type": "type_fn",
-          "named": true
-        },
-        {
-          "type": "type_hole",
-          "named": true
-        },
-        {
-          "type": "type_identifier",
-          "named": true
-        },
-        {
-          "type": "type_mut",
-          "named": true
-        },
-        {
-          "type": "type_record",
-          "named": true
-        },
-        {
-          "type": "type_tuple",
-          "named": true
-        },
-        {
-          "type": "type_variable",
-          "named": true
-        },
-        {
-          "type": "unit_type",
+          "type": "type_fn_parameter",
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "type_fn_parameter",
+    "named": true,
+    "fields": {
+      "mut": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "mut",
+            "named": false
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "parenthesized_type",
+            "named": true
+          },
+          {
+            "type": "type_apply",
+            "named": true
+          },
+          {
+            "type": "type_array",
+            "named": true
+          },
+          {
+            "type": "type_fn",
+            "named": true
+          },
+          {
+            "type": "type_hole",
+            "named": true
+          },
+          {
+            "type": "type_identifier",
+            "named": true
+          },
+          {
+            "type": "type_mut",
+            "named": true
+          },
+          {
+            "type": "type_record",
+            "named": true
+          },
+          {
+            "type": "type_tuple",
+            "named": true
+          },
+          {
+            "type": "type_variable",
+            "named": true
+          },
+          {
+            "type": "unit_type",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "type_fn_return",
+    "named": true,
+    "fields": {
+      "mut": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "mut",
+            "named": false
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "parenthesized_type",
+            "named": true
+          },
+          {
+            "type": "type_apply",
+            "named": true
+          },
+          {
+            "type": "type_array",
+            "named": true
+          },
+          {
+            "type": "type_fn",
+            "named": true
+          },
+          {
+            "type": "type_hole",
+            "named": true
+          },
+          {
+            "type": "type_identifier",
+            "named": true
+          },
+          {
+            "type": "type_mut",
+            "named": true
+          },
+          {
+            "type": "type_record",
+            "named": true
+          },
+          {
+            "type": "type_tuple",
+            "named": true
+          },
+          {
+            "type": "type_variable",
+            "named": true
+          },
+          {
+            "type": "unit_type",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -3018,6 +3153,10 @@
   },
   {
     "type": ":",
+    "named": false
+  },
+  {
+    "type": "::",
     "named": false
   },
   {

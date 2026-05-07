@@ -67,7 +67,7 @@ module.exports = grammar({
 				field("name", choice($.identifier, $.operator)),
 				optional(field("type_bounds", $.type_bounds)),
 				field("parameters", $.parameters),
-				optional(seq("->", field("return_type", $._type))),
+				optional(seq("->", field("return_type", $.return_type))),
 				field("body", $._expression),
 			),
 
@@ -138,7 +138,7 @@ module.exports = grammar({
 				"fn",
 				field("name", choice($.identifier, $.operator)),
 				field("parameters", $.parameters),
-				optional(seq("->", field("return_type", $._type))),
+				optional(seq("->", field("return_type", $.return_type))),
 				field("body", $._expression),
 			),
 
@@ -240,6 +240,7 @@ module.exports = grammar({
 		primary_expression: ($) =>
 			choice(
 				$.identifier,
+				$.type_identifier,
 				$.number,
 				$.string,
 				$.bool,
@@ -260,6 +261,7 @@ module.exports = grammar({
 				$.lambda_expression,
 				$.call_expression,
 				$.field_access_expression,
+				$.associated_access_expression,
 			),
 
 		call_expression: ($) =>
@@ -280,6 +282,16 @@ module.exports = grammar({
 					field("object", $.primary_expression),
 					".",
 					field("field", $.identifier),
+				),
+			),
+
+		associated_access_expression: ($) =>
+			prec.left(
+				PREC.FIELD,
+				seq(
+					field("type", choice($.type_identifier, $.identifier)),
+					"::",
+					field("member", $.identifier),
 				),
 			),
 
@@ -352,6 +364,7 @@ module.exports = grammar({
 			choice(
 				$.wildcard_pattern,
 				$.identifier,
+				$.type_identifier,
 				$.string,
 				$.constructor_pattern,
 				$.record_pattern,
@@ -364,7 +377,7 @@ module.exports = grammar({
 
 		constructor_pattern: ($) =>
 			seq(
-				field("name", $.identifier),
+				field("name", choice($.identifier, $.type_identifier)),
 				"(",
 				field("binding", $.identifier),
 				")",
@@ -485,7 +498,23 @@ module.exports = grammar({
 		type_rest: ($) => "..",
 
 		type_fn: ($) =>
-			seq("fn", "(", sep($._type, ","), ")", "->", $._type),
+			seq(
+				"fn",
+				"(",
+				sep($.type_fn_parameter, ","),
+				")",
+				"->",
+				field("return_type", $.type_fn_return),
+			),
+
+		type_fn_parameter: ($) =>
+			prec(1, seq(optional(field("mut", "mut")), field("type", $._type))),
+
+		type_fn_return: ($) =>
+			prec(1, seq(optional(field("mut", "mut")), field("type", $._type))),
+
+		return_type: ($) =>
+			prec(1, seq(optional(field("mut", "mut")), field("type", $._type))),
 
 		type_mut: ($) => seq("mut", field("type", $._type)),
 
