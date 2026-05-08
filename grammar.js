@@ -21,7 +21,7 @@ module.exports = grammar({
 
 	word: ($) => $.identifier,
 
-	extras: ($) => [/\s/, $.comment],
+	extras: ($) => [/\s/, $.comment, $.hashbang],
 
 	conflicts: ($) => [
 		[$.expression_statement, $.block],
@@ -29,10 +29,13 @@ module.exports = grammar({
 		[$.variant, $._type],
 		[$._type, $.type_apply],
 		[$.variant],
+		// Same ambiguity as block: the final expression inside `do { }` is
+		// not semicolon-terminated, so it looks like expression_statement.
+		[$.expression_statement, $.do_expression],
 	],
 
 	rules: {
-		program: ($) => repeat($._stmt),
+		program: ($) => repeat(choice($._stmt, $.inner_attribute)),
 
 		_stmt: ($) =>
 			choice(
@@ -180,6 +183,10 @@ module.exports = grammar({
 
 		extern_attribute: ($) => seq("#", "[", "template", "]"),
 
+		// `#![name]` — file-level inner attribute (e.g. `#![no_implicit_prelude]`).
+		inner_attribute: ($) =>
+			seq("#", "!", "[", field("name", $.identifier), "]"),
+
 		// --- Expressions ---
 
 		_expression: ($) =>
@@ -259,6 +266,7 @@ module.exports = grammar({
 				$.return_expression,
 				$.import_expression,
 				$.lambda_expression,
+				$.do_expression,
 				$.call_expression,
 				$.field_access_expression,
 				$.associated_access_expression,
@@ -325,6 +333,7 @@ module.exports = grammar({
 			choice(
 				seq("..", field("spread", $._expression)),
 				$.field_initializer,
+				field("shorthand", $.identifier),
 			),
 
 		record_expression: ($) =>
@@ -379,7 +388,7 @@ module.exports = grammar({
 			seq(
 				field("name", choice($.identifier, $.type_identifier)),
 				"(",
-				field("binding", $.identifier),
+				field("binding", $.pattern),
 				")",
 			),
 
@@ -444,6 +453,40 @@ module.exports = grammar({
 				"fn",
 				field("parameters", $.parameters),
 				choice(seq("->", field("body", $._expression)), field("body", $.block)),
+			),
+
+		// `do { ... }` — monadic block, desugared to >>= chains at parse time.
+		// Statements are either:
+		//   let [mut] pat [: ty] = expr ;   (plain let)
+		//   let [mut] pat [: ty] <- expr ;  (monadic bind)
+		//   expr ;                           (sequenced effect)
+		// The block must end with a final expression (no semicolon).
+		do_expression: ($) =>
+			seq(
+				"do",
+				"{",
+				repeat($.do_statement),
+				optional($._expression),
+				"}",
+			),
+
+		do_statement: ($) =>
+			choice(
+				$.do_bind_statement,
+				$.let_stmt,
+				$.expression_statement,
+			),
+
+		// `let [mut] pat [: ty] <- expr ;`
+		do_bind_statement: ($) =>
+			seq(
+				"let",
+				optional(field("mut", "mut")),
+				field("pattern", $.pattern),
+				optional(seq(":", field("type", $._type))),
+				"<-",
+				field("value", $._expression),
+				";",
 			),
 
 		// --- Types ---
@@ -541,7 +584,14 @@ module.exports = grammar({
 				/\.[+\-*/=!<>|&?$@^~%.]+/,
 			),
 
-		comment: ($) => token(seq("//", /.*/)),
+		// `#!/usr/bin/env hern` — shebang line; treated as whitespace (in extras).
+		// Uses a negative character class for the third char so it never matches
+		// `#![...]` (inner attributes), which also start with `#!`.
+		hashbang: ($) => token(seq("#!", /[^\[\n][^\n]*/)),
+
+		// Priority 1 ensures the comment token wins over the `operator` regex
+		// whenever both could match `//` at the same position.
+		comment: ($) => token(prec(1, seq("//", /.*/)))
 	},
 });
 
