@@ -68,9 +68,9 @@ module.exports = grammar({
 				"fn",
 				optional($._fn_fixity),
 				field("name", choice($.identifier, $.operator)),
-				optional(field("type_bounds", $.type_bounds)),
 				field("parameters", $.parameters),
 				optional(seq("->", field("return_type", $.return_type))),
+				optional(field("where_clause", $.where_clause)),
 				field("body", $._expression),
 			),
 
@@ -80,7 +80,7 @@ module.exports = grammar({
 				field("precedence", $.number),
 			),
 
-		type_bounds: ($) => seq("[", sep1($.type_bound, ","), "]"),
+		where_clause: ($) => seq("where", sep1($.type_bound, ",")),
 
 		type_bound: ($) =>
 			seq(
@@ -124,24 +124,47 @@ module.exports = grammar({
 		trait_parameter: ($) =>
 			seq(field("name", $.identifier), ":", field("type", $._type)),
 
-		// Handles both trait impls (`impl Trait for Type`) and inherent impls (`impl Type`).
-		impl_stmt: ($) =>
+		impl_stmt: ($) => choice($.trait_impl_stmt, $.inherent_impl_stmt),
+
+		trait_impl_stmt: ($) =>
 			seq(
 				"impl",
-				optional(seq(field("trait", $._type), "for")),
+				field("trait", $._type),
+				"for",
 				field("type", $._type),
+				optional(field("where_clause", $.where_clause)),
 				"{",
-				repeat($.impl_method),
+				repeat($.trait_impl_method),
 				"}",
 			),
 
-		impl_method: ($) =>
+		inherent_impl_stmt: ($) =>
+			seq(
+				"impl",
+				field("type", $._type),
+				optional(field("where_clause", $.where_clause)),
+				"{",
+				repeat($.inherent_impl_method),
+				"}",
+			),
+
+		trait_impl_method: ($) =>
 			seq(
 				optional($.attribute),
 				"fn",
 				field("name", choice($.identifier, $.operator)),
 				field("parameters", $.parameters),
 				optional(seq("->", field("return_type", $.return_type))),
+				field("body", $._expression),
+			),
+
+		inherent_impl_method: ($) =>
+			seq(
+				"fn",
+				field("name", $.identifier),
+				field("parameters", $.parameters),
+				optional(seq("->", field("return_type", $.return_type))),
+				optional(field("where_clause", $.where_clause)),
 				field("body", $._expression),
 			),
 
@@ -502,6 +525,7 @@ module.exports = grammar({
 				$.type_record,
 				$.type_fn,
 				$.type_mut,
+				$.never_type,
 				$.unit_type,
 				$.parenthesized_type,
 				$.type_tuple,
@@ -560,6 +584,8 @@ module.exports = grammar({
 			prec(1, seq(optional(field("mut", "mut")), field("type", $._type))),
 
 		type_mut: ($) => seq("mut", field("type", $._type)),
+
+		never_type: ($) => "!",
 
 		unit_type: ($) => seq("(", ")"),
 
