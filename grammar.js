@@ -43,6 +43,7 @@ module.exports = grammar({
 		[$.associated_type_record, $.record_pattern],
 		[$.record_rest_pattern, $.type_rest],
 		[$.associated_type, $.record_pattern_field],
+		[$.parameters, $.associated_type_fn],
 	],
 
 	rules: {
@@ -615,6 +616,7 @@ module.exports = grammar({
 			seq(
 				"fn",
 				field("parameters", $.parameters),
+				optional(seq("->", field("return_type", $._type))),
 				field("body", $.block),
 			),
 
