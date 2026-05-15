@@ -96,7 +96,8 @@ module.exports = grammar({
 
 		type_bound: ($) =>
 			seq(
-				field("var", choice($.identifier, $.type_variable)),
+				repeat1(field("arg", $._type)),
+				optional(seq("->", repeat1(field("dependent", $._type)))),
 				":",
 				sep1(field("trait", $.identifier), "+"),
 			),
@@ -269,6 +270,10 @@ module.exports = grammar({
 				["&&", PREC.AND],
 				["==", PREC.COMPARE],
 				["!=", PREC.COMPARE],
+				["<", PREC.COMPARE],
+				[">", PREC.COMPARE],
+				["<=", PREC.COMPARE],
+				[">=", PREC.COMPARE],
 				[$.operator, PREC.CONCAT],
 				["+", PREC.ADD],
 				["-", PREC.ADD],
@@ -305,7 +310,7 @@ module.exports = grammar({
 			),
 
 		unary_expression: ($) =>
-			prec(PREC.UNARY, seq(field("op", "!"), field("operand", $._expression))),
+			prec(PREC.UNARY, seq(field("op", choice("!", "-")), field("operand", $._expression))),
 
 		pipe_expression: ($) =>
 			prec.left(
