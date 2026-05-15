@@ -5,15 +5,16 @@
 const PREC = {
 	ASSIGN: 1,
 	PIPE: 2,
-	OR: 3,
-	AND: 4,
-	COMPARE: 5,
-	CONCAT: 6,
-	ADD: 7,
-	MUL: 8,
-	UNARY: 9,
-	FIELD: 10,
-	CALL: 11,
+	RANGE: 3,
+	OR: 4,
+	AND: 5,
+	COMPARE: 6,
+	CONCAT: 7,
+	ADD: 8,
+	MUL: 9,
+	UNARY: 10,
+	FIELD: 11,
+	CALL: 12,
 };
 
 module.exports = grammar({
@@ -32,6 +33,16 @@ module.exports = grammar({
 		// Same ambiguity as block: the final expression inside `do { }` is
 		// not semicolon-terminated, so it looks like expression_statement.
 		[$.expression_statement, $.do_expression],
+		[$.range_expression],
+		[$.primary_expression, $.associated_type],
+		[$.primary_expression, $.associated_type_apply],
+		[$.associated_type_hole, $.wildcard_pattern],
+		[$.associated_type, $.pattern],
+		[$.unit_expression, $.unit_type],
+		[$.associated_type_record, $.record_expression],
+		[$.associated_type_record, $.record_pattern],
+		[$.record_rest_pattern, $.type_rest],
+		[$.associated_type, $.record_pattern_field],
 	],
 
 	rules: {
@@ -102,10 +113,23 @@ module.exports = grammar({
 			seq(
 				"trait",
 				field("name", $.identifier),
-				field("param", choice($.identifier, $.type_variable)),
+				$.trait_params,
 				"{",
 				repeat($.trait_method),
 				"}",
+			),
+
+		trait_params: ($) =>
+			seq(
+				repeat1(field("param", choice($.identifier, $.type_variable))),
+				optional(
+					seq(
+						"->",
+						repeat1(
+							field("dependent", choice($.identifier, $.type_variable)),
+						),
+					),
+				),
 			),
 
 		trait_method: ($) =>
@@ -131,11 +155,17 @@ module.exports = grammar({
 				"impl",
 				field("trait", $._type),
 				"for",
-				field("type", $._type),
+				field("type", $.trait_impl_target),
 				optional(field("where_clause", $.where_clause)),
 				"{",
 				repeat($.trait_impl_method),
 				"}",
+			),
+
+		trait_impl_target: ($) =>
+			seq(
+				sep1(field("arg", $._type), ","),
+				optional(seq("->", sep1(field("dependent", $._type), ","))),
 			),
 
 		inherent_impl_stmt: ($) =>
@@ -218,6 +248,7 @@ module.exports = grammar({
 				$.binary_expression,
 				$.unary_expression,
 				$.pipe_expression,
+				$.range_expression,
 				$.primary_expression,
 			),
 
@@ -241,7 +272,6 @@ module.exports = grammar({
 				["+", PREC.ADD],
 				["-", PREC.ADD],
 				["*", PREC.MUL],
-				["..", PREC.CONCAT],
 			];
 
 			return choice(
@@ -257,6 +287,21 @@ module.exports = grammar({
 				),
 			);
 		},
+
+		range_expression: ($) =>
+			prec.left(
+				PREC.RANGE,
+				choice(
+					seq(
+						field("start", $._expression),
+						field("op", choice("..", "..=")),
+						field("end", $._expression),
+					),
+					seq(field("start", $._expression), field("op", "..")),
+					seq(field("op", "..="), field("end", $._expression)),
+					seq(field("op", ".."), optional(field("end", $._expression))),
+				),
+			),
 
 		unary_expression: ($) =>
 			prec(PREC.UNARY, seq(field("op", "!"), field("operand", $._expression))),
@@ -292,6 +337,7 @@ module.exports = grammar({
 				$.do_expression,
 				$.call_expression,
 				$.field_access_expression,
+				$.index_expression,
 				$.associated_access_expression,
 			),
 
@@ -316,14 +362,108 @@ module.exports = grammar({
 				),
 			),
 
+		index_expression: ($) =>
+			prec.left(
+				PREC.CALL,
+				seq(
+					field("receiver", $.primary_expression),
+					"[",
+					field("key", $._expression),
+					"]",
+				),
+			),
+
 		associated_access_expression: ($) =>
 			prec.left(
 				PREC.FIELD,
 				seq(
-					field("type", choice($.type_identifier, $.identifier)),
+					field("type", $.associated_target),
 					"::",
 					field("member", $.identifier),
 				),
+			),
+
+		associated_target: ($) =>
+			$.associated_type,
+
+		associated_type: ($) =>
+			choice(
+				$.associated_type_hole,
+				$.type_variable,
+				$.type_identifier,
+				$.identifier,
+				$.associated_type_apply,
+				$.associated_type_array,
+				$.associated_type_record,
+				$.associated_type_fn,
+				$.associated_type_mut,
+				$.never_type,
+				$.unit_type,
+				$.associated_parenthesized_type,
+				$.associated_type_tuple,
+			),
+
+		associated_type_apply: ($) =>
+			seq(
+				field("name", choice($.type_identifier, $.identifier, $.type_variable)),
+				"(",
+				sep1(field("argument", $.associated_type), ","),
+				")",
+			),
+
+		associated_type_hole: ($) => "_",
+
+		associated_type_array: ($) => seq("[", $.associated_type, "]"),
+
+		associated_type_record: ($) =>
+			seq(
+				"#",
+				"{",
+				choice(
+					seq(sep($.associated_type_field, ","), optional(",")),
+					seq(sep1($.associated_type_field, ","), ",", $.type_rest),
+					$.type_rest,
+				),
+				"}",
+			),
+
+		associated_type_field: ($) =>
+			seq(field("name", $.identifier), ":", field("type", $.associated_type)),
+
+		associated_type_fn: ($) =>
+			seq(
+				"fn",
+				"(",
+				sep($.associated_type_fn_parameter, ","),
+				")",
+				"->",
+				field("return_type", $.associated_type_fn_return),
+			),
+
+		associated_type_fn_parameter: ($) =>
+			prec(
+				1,
+				seq(optional(field("mut", "mut")), field("type", $.associated_type)),
+			),
+
+		associated_type_fn_return: ($) =>
+			prec(
+				1,
+				seq(optional(field("mut", "mut")), field("type", $.associated_type)),
+			),
+
+		associated_type_mut: ($) => seq("mut", field("type", $.associated_type)),
+
+		associated_parenthesized_type: ($) => seq("(", $.associated_type, ")"),
+
+		associated_type_tuple: ($) =>
+			seq(
+				"(",
+				$.associated_type,
+				",",
+				sep($.associated_type, ","),
+				optional(","),
+				")",
 			),
 
 		block: ($) => seq("{", repeat($.block_statement), optional($._expression), "}"),
@@ -475,7 +615,7 @@ module.exports = grammar({
 			seq(
 				"fn",
 				field("parameters", $.parameters),
-				choice(seq("->", field("body", $._expression)), field("body", $.block)),
+				field("body", $.block),
 			),
 
 		// `do { ... }` — monadic block, desugared to >>= chains at parse time.
