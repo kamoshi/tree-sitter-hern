@@ -26,8 +26,6 @@ module.exports = grammar({
 
 	conflicts: ($) => [
 		[$.expression_statement, $.block],
-		[$.variant, $._type, $.type_apply],
-		[$.variant, $._type],
 		[$._type, $.type_apply],
 		[$.variant],
 		// Same ambiguity as block: the final expression inside `do { }` is
@@ -311,7 +309,10 @@ module.exports = grammar({
 			prec.right(
 				PREC.ASSIGN,
 				seq(
-					field("left", choice($.identifier, $.field_access_expression)),
+					field(
+						"left",
+						choice($.identifier, $.field_access_expression, $.index_expression),
+					),
 					"=",
 					field("right", $._expression),
 				),
@@ -331,6 +332,7 @@ module.exports = grammar({
 				["+", PREC.ADD],
 				["-", PREC.ADD],
 				["*", PREC.MUL],
+				["/", PREC.MUL],
 			];
 
 			return choice(
@@ -685,6 +687,8 @@ module.exports = grammar({
 		import_expression: ($) => seq("import", $.string),
 
 		lambda_expression: ($) =>
+			// Lambda bodies require braces so `fn(x) { ... }` stays an expression
+			// atom and does not greedily consume surrounding expression syntax.
 			seq(
 				"fn",
 				field("parameters", $.parameters),

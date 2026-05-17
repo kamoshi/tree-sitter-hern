@@ -1,0 +1,52 @@
+================================================================================
+Operator precedence and index assignment
+================================================================================
+
+let result = 1 + 2 / 3;
+let item = arr[0];
+let changed = {
+  arr[0] = item;
+  arr
+};
+
+--------------------------------------------------------------------------------
+
+(program
+  (let_stmt
+    pattern: (pattern
+      (identifier))
+    value: (binary_expression
+      left: (primary_expression
+        (number))
+      right: (binary_expression
+        left: (primary_expression
+          (number))
+        right: (primary_expression
+          (number)))))
+  (let_stmt
+    pattern: (pattern
+      (identifier))
+    value: (primary_expression
+      (index_expression
+        receiver: (primary_expression
+          (identifier))
+        key: (primary_expression
+          (number)))))
+  (let_stmt
+    pattern: (pattern
+      (identifier))
+    value: (primary_expression
+      (block
+        (block_statement
+          (expression_statement
+            (assignment_expression
+              left: (index_expression
+                receiver: (primary_expression
+                  (identifier))
+                key: (primary_expression
+                  (number)))
+              right: (primary_expression
+                (identifier)))))
+        (primary_expression
+          (identifier))))))
+

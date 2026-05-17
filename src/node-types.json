@@ -99,6 +99,10 @@
           {
             "type": "identifier",
             "named": true
+          },
+          {
+            "type": "index_expression",
+            "named": true
           }
         ]
       },
@@ -571,6 +575,10 @@
           },
           {
             "type": "-",
+            "named": false
+          },
+          {
+            "type": "/",
             "named": false
           },
           {
@@ -4651,6 +4659,10 @@
   },
   {
     "type": "..=",
+    "named": false
+  },
+  {
+    "type": "/",
     "named": false
   },
   {

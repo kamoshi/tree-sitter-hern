@@ -5,6 +5,7 @@
 //!
 //! ```
 //! let code = r#"
+//! fn double(x: int) -> int { x * 2 }
 //! "#;
 //! let mut parser = tree_sitter::Parser::new();
 //! let language = tree_sitter_hern::LANGUAGE;
@@ -32,9 +33,10 @@ pub const LANGUAGE: LanguageFn = unsafe { LanguageFn::from_raw(tree_sitter_hern)
 /// [`node-types.json`]: https://tree-sitter.github.io/tree-sitter/using-parsers/6-static-node-types
 pub const NODE_TYPES: &str = include_str!("../../src/node-types.json");
 
-// NOTE: uncomment these to include any queries that this grammar contains:
+/// The syntax highlighting query for this language.
+pub const HIGHLIGHTS_QUERY: &str = include_str!("../../queries/highlights.scm");
 
-// pub const HIGHLIGHTS_QUERY: &str = include_str!("../../queries/highlights.scm");
+// NOTE: uncomment these to include any additional queries that this grammar contains:
 // pub const INJECTIONS_QUERY: &str = include_str!("../../queries/injections.scm");
 // pub const LOCALS_QUERY: &str = include_str!("../../queries/locals.scm");
 // pub const TAGS_QUERY: &str = include_str!("../../queries/tags.scm");
@@ -47,5 +49,12 @@ mod tests {
         parser
             .set_language(&super::LANGUAGE.into())
             .expect("Error loading Hern parser");
+    }
+
+    #[test]
+    fn test_highlights_query_compiles() {
+        let language = super::LANGUAGE.into();
+        tree_sitter::Query::new(&language, super::HIGHLIGHTS_QUERY)
+            .expect("Error loading Hern highlights query");
     }
 }
