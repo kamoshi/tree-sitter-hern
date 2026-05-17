@@ -52,10 +52,12 @@ module.exports = grammar({
 		_stmt: ($) =>
 			choice(
 				$.let_stmt,
-				$.fn_stmt,
+				$.fn_group_stmt,
+				$.test_stmt,
 				$.trait_stmt,
 				$.impl_stmt,
 				$.type_def_stmt,
+				$.type_alias_stmt,
 				$.extern_stmt,
 				$.expression_statement,
 			),
@@ -77,6 +79,7 @@ module.exports = grammar({
 
 		fn_stmt: ($) =>
 			seq(
+				repeat($.attribute),
 				"fn",
 				optional($._fn_fixity),
 				field("name", choice($.identifier, $.operator)),
@@ -84,6 +87,12 @@ module.exports = grammar({
 				optional(seq("->", field("return_type", $.return_type))),
 				optional(field("where_clause", $.where_clause)),
 				field("body", $._expression),
+			),
+
+		fn_group_stmt: ($) =>
+			choice(
+				$.fn_stmt,
+				seq($.fn_stmt, repeat1(seq("and", $.fn_stmt))),
 			),
 
 		_fn_fixity: ($) =>
@@ -136,7 +145,7 @@ module.exports = grammar({
 
 		trait_method: ($) =>
 			seq(
-				optional($.attribute),
+				repeat($.attribute),
 				"fn",
 				optional($._fn_fixity),
 				field("name", choice($.identifier, $.operator)),
@@ -182,7 +191,7 @@ module.exports = grammar({
 
 		trait_impl_method: ($) =>
 			seq(
-				optional($.attribute),
+				repeat($.attribute),
 				"fn",
 				field("name", choice($.identifier, $.operator)),
 				field("parameters", $.parameters),
@@ -192,6 +201,7 @@ module.exports = grammar({
 
 		inherent_impl_method: ($) =>
 			seq(
+				repeat($.attribute),
 				"fn",
 				field("name", $.identifier),
 				field("parameters", $.parameters),
@@ -202,15 +212,48 @@ module.exports = grammar({
 
 		type_def_stmt: ($) =>
 			seq(
+				repeat($.attribute),
 				"type",
 				field("name", $.identifier),
 				optional($.type_params),
 				"=",
 				choice(
+					"*",
 					prec.dynamic(1, seq(sep1($.variant, "|"))),
-					prec.dynamic(-1, $._type),
 				),
 				optional(";"),
+			),
+
+		type_alias_stmt: ($) =>
+			seq(
+				repeat($.attribute),
+				"type",
+				"alias",
+				field("name", $.identifier),
+				optional($.type_params),
+				"=",
+				field("type", $._type),
+				optional(";"),
+			),
+
+		test_stmt: ($) =>
+			seq(
+				"test",
+				"{",
+				repeat($.test_block_statement),
+				"}",
+			),
+
+		test_block_statement: ($) =>
+			choice(
+				$.let_stmt,
+				$.fn_group_stmt,
+				$.trait_stmt,
+				$.impl_stmt,
+				$.type_def_stmt,
+				$.type_alias_stmt,
+				$.extern_stmt,
+				$.expression_statement,
 			),
 
 		type_params: ($) =>
@@ -234,7 +277,17 @@ module.exports = grammar({
 				";",
 			),
 
-		attribute: ($) => seq("#", "[", "inline", "]"),
+		attribute: ($) =>
+			seq(
+				"#",
+				"[",
+				field("name", choice("inline", "test", "derive", $.identifier)),
+				optional($.attribute_arguments),
+				"]",
+			),
+
+		attribute_arguments: ($) =>
+			seq("(", sep1(field("argument", $.identifier), ","), optional(","), ")"),
 
 		extern_attribute: ($) => seq("#", "[", "template", "]"),
 
@@ -474,7 +527,7 @@ module.exports = grammar({
 
 		block: ($) => seq("{", repeat($.block_statement), optional($._expression), "}"),
 
-		block_statement: ($) => choice($.let_stmt, $.fn_stmt, $.expression_statement),
+		block_statement: ($) => choice($.let_stmt, $.fn_group_stmt, $.expression_statement),
 
 		unit_expression: ($) => seq("(", ")"),
 
@@ -541,6 +594,9 @@ module.exports = grammar({
 		pattern: ($) =>
 			choice(
 				$.wildcard_pattern,
+				$.range_pattern,
+				$.number_pattern,
+				$.bool,
 				$.identifier,
 				$.type_identifier,
 				$.string,
@@ -552,6 +608,17 @@ module.exports = grammar({
 			),
 
 		wildcard_pattern: ($) => "_",
+
+		number_pattern: ($) => seq(optional("-"), $.number),
+
+		range_pattern: ($) =>
+			seq(
+				optional("-"),
+				$.number,
+				choice("..", "..="),
+				optional("-"),
+				$.number,
+			),
 
 		constructor_pattern: ($) =>
 			seq(

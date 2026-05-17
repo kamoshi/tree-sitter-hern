@@ -464,7 +464,56 @@
   {
     "type": "attribute",
     "named": true,
-    "fields": {}
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "derive",
+            "named": false
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "inline",
+            "named": false
+          },
+          {
+            "type": "test",
+            "named": false
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "attribute_arguments",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "attribute_arguments",
+    "named": true,
+    "fields": {
+      "argument": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
   },
   {
     "type": "binary_expression",
@@ -638,7 +687,7 @@
           "named": true
         },
         {
-          "type": "fn_stmt",
+          "type": "fn_group_stmt",
           "named": true
         },
         {
@@ -1147,6 +1196,21 @@
     }
   },
   {
+    "type": "fn_group_stmt",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "fn_stmt",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "fn_stmt",
     "named": true,
     "fields": {
@@ -1252,6 +1316,16 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "attribute",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -1560,6 +1634,16 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "attribute",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -1999,6 +2083,21 @@
     "fields": {}
   },
   {
+    "type": "number_pattern",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "number",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "operator",
     "named": true,
     "fields": {}
@@ -2224,6 +2323,10 @@
       "required": true,
       "types": [
         {
+          "type": "bool",
+          "named": true
+        },
+        {
           "type": "constructor_pattern",
           "named": true
         },
@@ -2236,7 +2339,15 @@
           "named": true
         },
         {
+          "type": "number_pattern",
+          "named": true
+        },
+        {
           "type": "parenthesized_pattern",
+          "named": true
+        },
+        {
+          "type": "range_pattern",
           "named": true
         },
         {
@@ -2453,7 +2564,7 @@
           "named": true
         },
         {
-          "type": "fn_stmt",
+          "type": "fn_group_stmt",
           "named": true
         },
         {
@@ -2469,7 +2580,15 @@
           "named": true
         },
         {
+          "type": "test_stmt",
+          "named": true
+        },
+        {
           "type": "trait_stmt",
+          "named": true
+        },
+        {
+          "type": "type_alias_stmt",
           "named": true
         },
         {
@@ -2557,6 +2676,21 @@
           }
         ]
       }
+    }
+  },
+  {
+    "type": "range_pattern",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "number",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -2801,6 +2935,64 @@
     }
   },
   {
+    "type": "test_block_statement",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "expression_statement",
+          "named": true
+        },
+        {
+          "type": "extern_stmt",
+          "named": true
+        },
+        {
+          "type": "fn_group_stmt",
+          "named": true
+        },
+        {
+          "type": "impl_stmt",
+          "named": true
+        },
+        {
+          "type": "let_stmt",
+          "named": true
+        },
+        {
+          "type": "trait_stmt",
+          "named": true
+        },
+        {
+          "type": "type_alias_stmt",
+          "named": true
+        },
+        {
+          "type": "type_def_stmt",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "test_stmt",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "test_block_statement",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "trait_impl_method",
     "named": true,
     "fields": {
@@ -2870,7 +3062,7 @@
       }
     },
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": false,
       "types": [
         {
@@ -3212,7 +3404,7 @@
       }
     },
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": false,
       "types": [
         {
@@ -3420,6 +3612,94 @@
       "types": [
         {
           "type": "pattern",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type_alias_stmt",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "never_type",
+            "named": true
+          },
+          {
+            "type": "parenthesized_type",
+            "named": true
+          },
+          {
+            "type": "type_apply",
+            "named": true
+          },
+          {
+            "type": "type_array",
+            "named": true
+          },
+          {
+            "type": "type_fn",
+            "named": true
+          },
+          {
+            "type": "type_hole",
+            "named": true
+          },
+          {
+            "type": "type_identifier",
+            "named": true
+          },
+          {
+            "type": "type_mut",
+            "named": true
+          },
+          {
+            "type": "type_record",
+            "named": true
+          },
+          {
+            "type": "type_tuple",
+            "named": true
+          },
+          {
+            "type": "type_variable",
+            "named": true
+          },
+          {
+            "type": "unit_type",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "type_params",
           "named": true
         }
       ]
@@ -3719,62 +3999,14 @@
     },
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "never_type",
-          "named": true
-        },
-        {
-          "type": "parenthesized_type",
-          "named": true
-        },
-        {
-          "type": "type_apply",
-          "named": true
-        },
-        {
-          "type": "type_array",
-          "named": true
-        },
-        {
-          "type": "type_fn",
-          "named": true
-        },
-        {
-          "type": "type_hole",
-          "named": true
-        },
-        {
-          "type": "type_identifier",
-          "named": true
-        },
-        {
-          "type": "type_mut",
+          "type": "attribute",
           "named": true
         },
         {
           "type": "type_params",
-          "named": true
-        },
-        {
-          "type": "type_record",
-          "named": true
-        },
-        {
-          "type": "type_tuple",
-          "named": true
-        },
-        {
-          "type": "type_variable",
-          "named": true
-        },
-        {
-          "type": "unit_type",
           "named": true
         },
         {
@@ -4474,6 +4706,14 @@
     "named": false
   },
   {
+    "type": "alias",
+    "named": false
+  },
+  {
+    "type": "and",
+    "named": false
+  },
+  {
     "type": "break",
     "named": false
   },
@@ -4484,6 +4724,10 @@
   },
   {
     "type": "continue",
+    "named": false
+  },
+  {
+    "type": "derive",
     "named": false
   },
   {
@@ -4581,6 +4825,10 @@
   },
   {
     "type": "template",
+    "named": false
+  },
+  {
+    "type": "test",
     "named": false
   },
   {
